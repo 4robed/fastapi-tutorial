@@ -28,8 +28,26 @@ def fetch_recipe(*, recipe_id: int) -> dict:
         return result[0]
 
 
-app.include_router(api)
+@api.get('/search/', status_code=200)
+def search_recipes(
+    keyword: str | None = None,
+    max_results: int | None = 10,
+) -> dict:
+    """
+    Search recipe by keyword, with max_results
+    :param keyword:
+    :param max_results:
+    :return:
+    """
+    if not keyword:
+        return {'results': RECIPES[:max_results]}
+    results = filter(
+        lambda recipe: keyword.lower() in recipe['label'].lower(), RECIPES
+    )
+    return {'results': list(results)[:max_results]}
 
+
+app.include_router(api)
 
 if __name__ == '__main__':
     import uvicorn
