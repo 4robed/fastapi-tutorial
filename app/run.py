@@ -21,8 +21,7 @@ def hello_world(request: Request):
     get index
     """
     return TEMPLATES.TemplateResponse(
-        'index.html',
-        {'request': request, 'recipes': RECIPES}
+        'index.html', {'request': request, 'recipes': RECIPES}
     )
 
 
@@ -73,7 +72,7 @@ def create_recipe(*, recipe_in: RecipeCreate) -> dict:
         id=new_entry_id,
         label=recipe_in.label,
         source=recipe_in.source,
-        url=recipe_in.url
+        url=recipe_in.url,
     ).dict()
     RECIPES.append(recipe_entry)
     return recipe_entry
