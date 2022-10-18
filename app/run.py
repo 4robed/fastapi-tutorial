@@ -1,6 +1,13 @@
-from fastapi import FastAPI, APIRouter, Query, HTTPException
+from fastapi import FastAPI, APIRouter, Query, HTTPException, Request
+from fastapi.templating import Jinja2Templates
+
 from schema.recipe import Recipe, RecipeSearchResults, RecipeCreate
 from models import RECIPES
+from pathlib import Path
+
+BASE_PATH = Path(__file__).resolve().parent
+TEMPLATES = Jinja2Templates(directory=str(BASE_PATH / 'templates'))
+
 
 # init FastAPI app
 app = FastAPI(title='FastAPI tutorial', openapi_url='/openapi.json')
@@ -9,12 +16,14 @@ api = APIRouter()
 
 
 @api.get('/', status_code=200)
-def hello_world() -> dict:
+def hello_world(request: Request):
     """
     get index
-    :return: Dict
     """
-    return dict(message='Hello World!')
+    return TEMPLATES.TemplateResponse(
+        'index.html',
+        {'request': request, 'recipes': RECIPES}
+    )
 
 
 @api.get('/recipe/{recipe_id}', status_code=200, response_model=Recipe)
