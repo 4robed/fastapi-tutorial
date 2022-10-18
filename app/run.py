@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Query
+from fastapi import FastAPI, APIRouter, Query, HTTPException
 from schema.recipe import Recipe, RecipeSearchResults, RecipeCreate
 from models import RECIPES
 
@@ -25,8 +25,11 @@ def fetch_recipe(*, recipe_id: int) -> dict:
     :return: Dict
     """
     result = [rcp for rcp in RECIPES if rcp['id'] == recipe_id]
-    if result:
-        return result[0]
+    if not result:
+        raise HTTPException(
+            status_code=404, detail=f'Recipe with ID {recipe_id} not found'
+        )
+    return result[0]
 
 
 @api.get('/search/', status_code=200, response_model=RecipeSearchResults)
