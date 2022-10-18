@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Query
+from schema.recipe import Recipe, RecipeSearchResults, RecipeCreate
 from models import RECIPES
 
 # init FastAPI app
@@ -16,7 +17,7 @@ def hello_world() -> dict:
     return dict(message='Hello World!')
 
 
-@api.get('/recipe/{recipe_id}', status_code=200)
+@api.get('/recipe/{recipe_id}', status_code=200, response_model=Recipe)
 def fetch_recipe(*, recipe_id: int) -> dict:
     """
     Fetch a single recipe by ID
@@ -28,9 +29,10 @@ def fetch_recipe(*, recipe_id: int) -> dict:
         return result[0]
 
 
-@api.get('/search/', status_code=200)
+@api.get('/search/', status_code=200, response_model=RecipeSearchResults)
 def search_recipes(
-    keyword: str | None = None,
+    *,
+    keyword: str | None = Query(default=None, min_length=3, example='chicken'),
     max_results: int | None = 10,
 ) -> dict:
     """
@@ -45,6 +47,24 @@ def search_recipes(
         lambda recipe: keyword.lower() in recipe['label'].lower(), RECIPES
     )
     return {'results': list(results)[:max_results]}
+
+
+@api.post('/recipe/', status_code=201, response_model=Recipe)
+def create_recipe(*, recipe_in: RecipeCreate) -> dict:
+    """
+    Create a new recipe (in memory only)
+    :param recipe_in:
+    :return:
+    """
+    new_entry_id = len(RECIPES) + 1
+    recipe_entry = Recipe(
+        id=new_entry_id,
+        label=recipe_in.label,
+        source=recipe_in.source,
+        url=recipe_in.url
+    ).dict()
+    RECIPES.append(recipe_entry)
+    return recipe_entry
 
 
 app.include_router(api)

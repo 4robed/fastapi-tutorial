@@ -3,7 +3,7 @@ RECIPES = [
         "id": 1,
         "label": "Chicken Vesuvio",
         "source": "Serious Eats",
-        "url": "http:s//www.seriouseats.com/recipes/2011/12/chicken-vesuvio-recipe.html",
+        "url": "https://www.seriouseats.com/recipes/2011/12/chicken-vesuvio-recipe.html",
     },
     {
         "id": 2,
